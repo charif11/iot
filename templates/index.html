@@ -1,0 +1,51 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %} Page2 {% endblock %}
+
+{% block styles %}
+{{ super() }}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+    $(function() {
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('data', function(data) {
+            console.log(data);
+            document.getElementById('data').innerHTML = data;
+        });
+        socket.on('tmp', function(data) {
+            console.log('Received temperature data:', data);
+            document.getElementById('tmp_data').innerHTML = data;
+        });
+        socket.on('hum', function(data) {
+            console.log('Received humidity data:', data);
+            document.getElementById('hum_data').innerHTML = data;
+        });
+
+        $('#open_led1').click(function(event) {
+		var data = '{"topic": "esp/led1", "message": "ON", "qos": 0}';
+		socket.emit('publish', data=data);
+		// $('#open_fan').hide();
+		// $('#close_fan').show();
+        });
+        $('#close_led1').click(function(event) {
+		var data = '{"topic": "esp/led1", "message": "OFF", "qos": 0}';
+		socket.emit('publish', data=data);
+		// $('#open_fan').hide();
+		// $('#close_fan').show();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<h1>Hello Flask Index File</h1>
+<h1>Show Temperature Data : <span id="tmp_data">none</span> </h1>
+<h1>Show Humidity Data : <span id="hum_data">none</span> </h1>
+<button id="open_led1">เปิด</button>
+<button id="close_led1">ปิด</button>
+{% endblock %}
